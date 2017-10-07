@@ -14,6 +14,17 @@
 <div class="container">
   <div class="row">
     <div class="col">
+			<form id="jobForm">
+				<div class="form-group">
+					<label>Job title</label>
+					<input id="jobTitle" type="text" class="form-control" placeholder="Enter job title">
+				</div>
+				<div class="form-group">
+					<label>Job description</label>
+					<textarea id="jobDescription" class="form-control" rows="3"></textarea>
+				</div>
+				<button type="submit" class="btn btn-primary">Submit</button>
+			</form>
     </div>
     <div id="firstPhase" class="col">
     </div>
@@ -37,6 +48,22 @@
 <script src="/scripts/tooltip.js/dist/tooltip.min.js"></script>
 <script src="/scripts/bootstrap/dist/js/bootstrap.min.js"></script>
 <script src="/socket.io/socket.io.js"></script>
+<script>
+$( document ).ready(function() {
+	let socket = io();
+	$("#jobForm").submit(function(e){
+		e.preventDefault();
+		let jobTitle = $("#jobTitle").val();
+		let jobDescription = $("#jobDescription").val();
+		socket.emit('newJob', { jobTitle : jobTitle, jobDescription : jobDescription } );
+	});
+	
+	socket.on("addNewJob", function(data){
+		console.log(data);
+	});
+	
+});
+</script>
 </body>
 </html>
 
