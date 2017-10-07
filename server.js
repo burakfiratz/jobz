@@ -28,4 +28,11 @@ io.on("connection", function(socket){
 		io.emit("addNewJob", data);
 	});
 	
+	socket.on('updateJobPhase', function(data){
+		objIndex = jobQueue.findIndex(obj => obj.guid == data.jobGuid);
+		jobQueue[objIndex].phase = data.phaseName;
+		
+		io.emit("sendUpdatedJobPhase", jobQueue[objIndex]);
+	});
+	
 });

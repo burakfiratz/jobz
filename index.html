@@ -76,6 +76,43 @@ $( document ).ready(function() {
 		});
 	});
 	
+	$("#firstPhase, #progressPhase, #donePhase").sortable({
+      connectWith: ".col",
+			change: function(e, ui) {
+				//console.log(ui.item.parent()[0].id);
+			},
+			update: function(e, ui) {
+				if (this === ui.item.parent()[0]) {
+					updateJobPhase(ui.item.data("guid"), ui.item.data("phase"), ui.item.parent()[0].id);
+				}
+      }
+    }).disableSelection();
+	
+	socket.on('sendUpdatedJobPhase', function(data){
+			$('*[data-guid="'+ data.guid +'"]').remove();
+			let divCard = cardSkeleton(data);
+			$('#'+data.phase).append(divCard);
+			
+			/*
+			$('*[data-guid="'+ data.guid +'"]').removeClass (function (index, classname) {
+				return (classname.match (/bg-[a-z]* /) || []).join(' ');
+			});
+			
+			/*
+			if(data.phase === 'firstPhase')
+				$('*[data-guid="'+ data.guid +'"]').addClass('bg-primary');
+			else if(data.phase === 'progressPhase')
+				$('*[data-guid="'+ data.guid +'"]').addClass('bg-warning');
+			else
+				$('*[data-guid="'+ data.guid +'"]').addClass('bg-success');
+			*/
+		});
+		
+		function updateJobPhase(jobGuid, oldPhaseName, newPhaseName){
+			$('*[data-guid="'+ jobGuid +'"]').remove();
+			socket.emit('updateJobPhase', { jobGuid : jobGuid, phaseName : newPhaseName });
+		}
+	
 	function cardSkeleton(data){
 			return '<div '+
 			'data-guid="'+ data.guid +'" '+
