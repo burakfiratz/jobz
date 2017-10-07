@@ -1,0 +1,28 @@
+{
+  "name": "jobz",
+  "version": "1.0.0",
+  "description": "Job queue with socket.io & node.js for fun",
+  "main": "server.js",
+  "dependencies": {
+    "bootstrap": "^4.0.0-beta",
+    "express": "^4.16.1",
+    "jquery": "^3.2.1",
+    "popper.js": "^1.12.5",
+    "socket.io": "^2.0.3",
+    "tooltip.js": "^1.1.5"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/burakfiratz/jobz.git"
+  },
+  "author": "burakfiratz",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/burakfiratz/jobz/issues"
+  },
+  "homepage": "https://github.com/burakfiratz/jobz#readme"
+}
