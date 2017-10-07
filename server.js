@@ -3,7 +3,9 @@ let express = require('express'),
 		server = require('http').createServer(app),
 		io = require('socket.io').listen(server),
 		port = process.env.port || 3000,
-		jobQueue = [ { jobTitle : 'zz', jobDescription : 'xx' } ];
+		jobQueue = [	{ guid : '75632464-4b89-4919-af69-da0662140525', jobTitle : 'qqq', jobDescription : 'www', phase : 'firstPhase' },
+									{ guid : 'e29890e5-d669-455b-9b93-04c21ba3ea32', jobTitle : 'eee', jobDescription : 'rrr', phase : 'progressPhase' },
+									{ guid : '832ab2c6-ad71-47b8-99e3-73ba028b28fa', jobTitle : 'zz', jobDescription : 'xx', phase : 'progressPhase' }];
 
 server.listen(port, function(){
 	console.log('Listening port: ' + port);
@@ -17,6 +19,8 @@ app.get('/', function(req, res){
 
 io.on("connection", function(socket){
 	console.log('Socket open');
+	
+	socket.emit('welcome', jobQueue);
 	
 	socket.on("newJob", function(data){
 		//console.log(data);

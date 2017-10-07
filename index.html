@@ -55,12 +55,46 @@ $( document ).ready(function() {
 		e.preventDefault();
 		let jobTitle = $("#jobTitle").val();
 		let jobDescription = $("#jobDescription").val();
-		socket.emit('newJob', { jobTitle : jobTitle, jobDescription : jobDescription } );
+		socket.emit('newJob', { guid : uuidv4(), jobTitle : jobTitle, jobDescription : jobDescription, phase : 'firstPhase' } );
 	});
 	
 	socket.on("addNewJob", function(data){
-		console.log(data);
+		let divCard= cardSkeleton(data);
+		$("#firstPhase").append(divCard);
 	});
+	
+	socket.on('welcome', function(data){
+		let divCard;
+		data.forEach(function(item) {
+				divCard=cardSkeleton(item);
+				if(item.phase === 'firstPhase')
+					$("#firstPhase").append(divCard);
+				else if(item.phase === 'progressPhase')
+					$("#progressPhase").append(divCard);
+				else
+					$("#donePhase").append(divCard);
+		});
+	});
+	
+	function cardSkeleton(data){
+			return '<div '+
+			'data-guid="'+ data.guid +'" '+
+			'data-phase="'+ data.phase +'" '+
+			'class="card bg-light mb-3">'+
+				'<div class="card-header ui-state-default">'+
+			data.jobTitle +
+			'</div>'+
+			'<div class="card-body">'+
+				'<p class="card-text">'+ data.jobDescription +'</p>'+
+			'</div>'+
+			'</div>';
+		}
+		
+		function uuidv4() {
+			return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+				(c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+			)
+		}
 	
 });
 </script>
