@@ -26,11 +26,22 @@
 				<button type="submit" class="btn btn-primary">Submit</button>
 			</form>
     </div>
-    <div id="firstPhase" class="col">
+    <div id="firstPhase" class="col list-group">
+				<a href="#" class="list-group-item list-group-item-action">Cras justo odio</a>
+				<a href="#" class="list-group-item list-group-item-action">Dapibus ac facilisis in</a>
+				<a href="#" class="list-group-item list-group-item-action">Morbi leo risus</a>
+				<a href="#" class="list-group-item list-group-item-action">Porta ac consectetur ac</a>
+				<a href="#" class="list-group-item list-group-item-action">Vestibulum at eros</a>
+				<div data-guid="05308c7d-e559-4c5e-95e3-a27d30b96627" data-phase="firstPhase" class="card bg-light mb-3">
+					<div class="card-header ui-state-default">ööö</div>
+				<div class="card-body">
+					<p class="card-text">çççç</p>
+				</div>
+				</div>
     </div>
-    <div id="progressPhase" class="col">
+    <div id="progressPhase" class="col list-group">
     </div>
-		<div id="donePhase" class="col">
+		<div id="donePhase" class="col  list-group">
     </div>
   </div>
 </div>
@@ -59,14 +70,16 @@ $( document ).ready(function() {
 	});
 	
 	socket.on("addNewJob", function(data){
-		let divCard= cardSkeleton(data);
+		//let divCard = cardSkeleton(data);
+		let divCard = listGroupSkeleton(data);
 		$("#firstPhase").append(divCard);
 	});
 	
 	socket.on('welcome', function(data){
 		let divCard;
 		data.forEach(function(item) {
-				divCard=cardSkeleton(item);
+				//divCard=cardSkeleton(item);
+				divCard = listGroupSkeleton(item);
 				if(item.phase === 'firstPhase')
 					$("#firstPhase").append(divCard);
 				else if(item.phase === 'progressPhase')
@@ -76,6 +89,20 @@ $( document ).ready(function() {
 		});
 	});
 	
+	
+	$("#firstPhase, #progressPhase, #donePhase").sortable({
+		connectWith: ".list-group",
+			change: function(e, ui) {
+				//console.log(ui.item.parent()[0].id);
+		},
+		update: function(e, ui) {
+				if (this === ui.item.parent()[0]) {
+					updateJobPhase(ui.item.data("guid"), ui.item.data("phase"), ui.item.parent()[0].id);
+				}
+      }
+	});
+	
+	/*
 	$("#firstPhase, #progressPhase, #donePhase").sortable({
       connectWith: ".col",
 			change: function(e, ui) {
@@ -87,10 +114,12 @@ $( document ).ready(function() {
 				}
       }
     }).disableSelection();
+	*/
 	
 	socket.on('sendUpdatedJobPhase', function(data){
 			$('*[data-guid="'+ data.guid +'"]').remove();
-			let divCard = cardSkeleton(data);
+			//let divCard = cardSkeleton(data);
+			let divCard = listGroupSkeleton(data);
 			$('#'+data.phase).append(divCard);
 			
 			/*
@@ -112,20 +141,29 @@ $( document ).ready(function() {
 			$('*[data-guid="'+ jobGuid +'"]').remove();
 			socket.emit('updateJobPhase', { jobGuid : jobGuid, phaseName : newPhaseName });
 		}
-	
-	function cardSkeleton(data){
-			return '<div '+
-			'data-guid="'+ data.guid +'" '+
-			'data-phase="'+ data.phase +'" '+
-			'class="card bg-light mb-3">'+
-				'<div class="card-header ui-state-default">'+
-			data.jobTitle +
-			'</div>'+
-			'<div class="card-body">'+
-				'<p class="card-text">'+ data.jobDescription +'</p>'+
-			'</div>'+
-			'</div>';
+		
+		function listGroupSkeleton(data){
+			return '<a href="#" class="list-group-item list-group-item-action" '+
+						'data-guid="'+ data.guid +'" '+
+						'data-phase="'+ data.phase +'" '+
+						'>'+
+						data.jobTitle+
+						'</a>';
 		}
+	
+		function cardSkeleton(data){
+				return '<div '+
+				'data-guid="'+ data.guid +'" '+
+				'data-phase="'+ data.phase +'" '+
+				'class="card bg-light mb-3">'+
+					'<div class="card-header ui-state-default">'+
+				data.jobTitle +
+				'</div>'+
+				'<div class="card-body">'+
+					'<p class="card-text">'+ data.jobDescription +'</p>'+
+				'</div>'+
+				'</div>';
+			}
 		
 		function uuidv4() {
 			return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>

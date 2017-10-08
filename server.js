@@ -21,7 +21,7 @@ io.on("connection", function(socket){
 	console.log('Socket open');
 	
 	socket.emit('welcome', jobQueue);
-	
+	console.log(jobQueue);
 	socket.on("newJob", function(data){
 		//console.log(data);
 		jobQueue.push(data);
