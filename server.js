@@ -3,10 +3,11 @@ let express = require('express'),
 		server = require('http').createServer(app),
 		io = require('socket.io').listen(server),
 		port = process.env.port || 3000,
-		jobQueue = [	{ guid : '75632464-4b89-4919-af69-da0662140525', jobTitle : 'qqq', jobDescription : 'www', phase : 'firstPhase' },
-									{ guid : 'e29890e5-d669-455b-9b93-04c21ba3ea32', jobTitle : 'eee', jobDescription : 'rrr', phase : 'progressPhase' },
-									{ guid : '832ab2c6-ad71-47b8-99e3-73ba028b28fa', jobTitle : 'zz', jobDescription : 'xx', phase : 'progressPhase' }];
-
+		jobQueue = [],
+		phaseCount = [	{ phase:'firstPhase', count:0 }, 
+										{ phase:'progressPhase', count:0 }, 
+										{ phase:'donePhase', count:0 }];
+		
 server.listen(port, function(){
 	console.log('Listening port: ' + port);
 });
@@ -20,12 +21,14 @@ app.get('/', function(req, res){
 io.on("connection", function(socket){
 	console.log('Socket open');
 	
-	socket.emit('welcome', jobQueue);
+	welcome();
+	
 	console.log(jobQueue);
 	socket.on("newJob", function(data){
 		//console.log(data);
 		jobQueue.push(data);
 		io.emit("addNewJob", data);
+		updatePhaseCount()
 	});
 	
 	socket.on('updateJobPhase', function(data){
@@ -33,6 +36,19 @@ io.on("connection", function(socket){
 		jobQueue[objIndex].phase = data.phaseName;
 		
 		io.emit("sendUpdatedJobPhase", jobQueue[objIndex]);
+		updatePhaseCount();
 	});
+	
+	function welcome(){
+		socket.emit('welcome', jobQueue);
+		updatePhaseCount();
+	}
+	
+	function updatePhaseCount(){
+		phaseCount = [	{ phase: 'firstPhase', count: jobQueue.filter(obj => obj.phase === 'firstPhase').length }, 
+										{ phase: 'progressPhase', count: jobQueue.filter(obj => obj.phase === 'progressPhase').length }, 
+										{ phase: 'donePhase', count: jobQueue.filter(obj => obj.phase === 'donePhase').length } ];
+		io.emit("updatePhaseCount", phaseCount);
+	}
 	
 });
